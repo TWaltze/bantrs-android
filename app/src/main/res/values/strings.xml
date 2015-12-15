@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Bantrs</string>
+    <string name="loading.rooms">Loading rooms...</string>
 </resources>

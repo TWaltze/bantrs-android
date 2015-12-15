@@ -1,0 +1,4 @@
+<resources>
+    <string name="prompt_comment">Comment</string>
+    <string name="action_create_comment">Comment</string>
+</resources>

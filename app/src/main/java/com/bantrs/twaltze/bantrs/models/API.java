@@ -9,15 +9,15 @@ import com.squareup.okhttp.Response;
 import java.io.IOException;
 import com.google.gson.*;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import org.json.JSONObject;
 
 public abstract class API {
-    public static final String api = "http://10.0.2.2:3000/";
+    public static final String api = "http://192.168.1.128:3000/";
     protected final OkHttpClient client = new OkHttpClient();
-    protected final Gson gson = new Gson();
 
     public static JSONObject getMeta(String json) {
         try {
@@ -52,37 +52,57 @@ public abstract class API {
         return -1;
     }
 
-    public APIResponse get(String url) throws Exception {
-        Request request = new Request.Builder()
+    public static APIResponse get(String url) throws Exception {
+        Request.Builder builder = new Request.Builder().url(url);
+
+        return makeRequest(builder);
+    }
+
+    public static APIResponse post(String url, RequestBody body) throws Exception {
+        Request.Builder builder = new Request.Builder()
                 .url(url)
-                .build();
+                .post(body);
+
+        return makeRequest(builder);
+    }
+
+    private static APIResponse makeRequest(Request.Builder builder) throws Exception {
+        if (Auth.getInstance().isLoggedIn()) {
+            System.out.println("Authenticated Request");
+            System.out.println(Auth.getInstance().getToken());
+            builder.header("Authorization", Auth.getInstance().getToken());
+        } else {
+            System.out.println("Not Authenticated Request");
+        }
+
+        Request request = builder.build();
+        OkHttpClient client = new OkHttpClient();
 
         return new APIResponse(client.newCall(request).execute());
     }
 
-    public APIResponse post(String url, RequestBody body) throws Exception {
-        Request request = new Request.Builder()
-                .url(url)
-                .post(body)
-                .build();
-
-        return new APIResponse(client.newCall(request).execute());
-    }
-
-    protected class APIResponse {
+    protected static class APIResponse {
         private boolean successful;
         private JSONObject meta;
-        private JSONObject data;
+        private JSONObject dataAsObject;
+        private JSONArray dataAsArray;
 
         public APIResponse(Response response) {
             try {
                 successful = response.isSuccessful();
 
                 String body = response.body().string();
+                System.out.println(body);
                 JSONObject json = new JSONObject(body);
 
                 meta = json.getJSONObject("meta");
-                data = json.getJSONObject("data");
+
+                Object holder = json.get("data");
+                if (holder instanceof JSONObject) {
+                    dataAsObject = (JSONObject)holder;
+                } else if (holder instanceof JSONArray) {
+                    dataAsArray = (JSONArray)holder;
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -92,8 +112,12 @@ public abstract class API {
             return meta;
         }
 
-        public JSONObject getData() {
-            return data;
+        public JSONObject getObjectData() {
+            return dataAsObject;
+        }
+
+        public JSONArray getArrayData() {
+            return dataAsArray;
         }
 
         public boolean isSuccessful() {

@@ -7,10 +7,14 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 
 public class User extends API {
     private String url;
@@ -27,18 +31,14 @@ public class User extends API {
     }
 
     public User(JSONObject data) {
-        System.out.println("JSONObject");
-        System.out.println(data);
         try {
+            url = api + "user/";
             uid = data.getString("uid");
             username = data.getString("username");
             email = data.getString("email");
-
-            System.out.println(username);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
     }
 
     private void getUser() {
@@ -60,23 +60,23 @@ public class User extends API {
         });
     }
 
-    public String getRooms() throws Exception {
-        Request request = new Request.Builder()
-                .url(url + username + "/rooms")
-                .header("Authorization", "12ac39e5c267e18ed363dc80ccfcd329952f0c1b2ce2e89c5b317dc1f5eb5eb7")
-                .build();
+    public List<Room> getRooms() throws Exception {
+        System.out.println("getRooms");
 
-        Response response = client.newCall(request).execute();
+        APIResponse response = get(url + username + "/rooms");
 
         if (response.isSuccessful()) {
-            System.out.println("Successful.");
+            JSONArray body = response.getArrayData();
 
-            String body = response.body().string();
-            System.out.println(body);
-            return body;
+            List<Room> rooms = new ArrayList<Room>(body.length());
+            for (int i = 0; i < body.length(); i++) {
+                JSONObject room = body.getJSONObject(i);
+                rooms.add(new Room(room));
+            }
+
+            return rooms;
         } else {
-            System.out.println("Failed.");
-            return "Failed to get rooms.";
+            return new ArrayList<Room>();
         }
     }
 }

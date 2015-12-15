@@ -1,0 +1,70 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    tools:context=".RoomActivity"
+    android:background="#efefef"
+    android:weightSum="1">
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="100dp"
+        android:text="Title"
+        android:id="@+id/textView"
+        android:layout_gravity="left"
+        android:gravity="center_vertical"
+        android:textSize="@dimen/abc_text_size_display_1_material"
+        android:background="#20a4f3"
+        android:textColor="#ffffff"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp" />
+
+    <RelativeLayout android:id="@+id/comments_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        tools:context=".RoomActivity"
+        android:background="#ffffff"
+        android:weightSum="1">
+
+        <!--<android.support.v7.widget.RecyclerView-->
+            <!--android:id="@+id/comments_list"-->
+            <!--android:background="#ffffff"-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_marginLeft="@dimen/activity_horizontal_margin"-->
+            <!--android:layout_marginRight="@dimen/activity_horizontal_margin"-->
+            <!--android:layout_above="@+id/create_comment" />-->
+
+        <LinearLayout android:id="@+id/create_comment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#efefef"
+            android:layout_alignParentBottom="true">
+
+            <EditText android:id="@+id/comment_text"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:hint="@string/prompt_comment"
+                android:imeOptions="actionUnspecified"
+                android:gravity="top"
+                android:inputType="text"
+                android:maxLines="2"
+                android:singleLine="false" />
+
+            <Button android:id="@+id/create_comment_button" style="?android:textAppearanceSmall"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/action_create_comment"
+                android:textStyle="bold"
+                android:layout_alignParentBottom="true"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+</LinearLayout>
+

@@ -27,6 +27,14 @@
             android:name=".FeedActivity"
             android:label="@string/app_name" >
         </activity>
+        <activity
+            android:name=".CreateRoomActivity"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name=".RoomActivity"
+            android:label="@string/app_name" >
+        </activity>
     </application>
 
 </manifest>

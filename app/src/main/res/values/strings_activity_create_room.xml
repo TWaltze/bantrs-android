@@ -1,0 +1,5 @@
+<resources>
+    <string name="prompt_title">Title</string>
+    <string name="prompt_url">URL</string>
+    <string name="action_create_room">Create Room</string>
+</resources>

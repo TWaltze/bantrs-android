@@ -11,54 +11,27 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 public class Auth extends API {
+    private static final Auth INSTANCE = new Auth();
+
     private String url;
     private boolean isLoggedIn = false;
+    private String token;
+    private User user;
 
-    public Auth() {
+    private Auth() {
+        if (INSTANCE != null) {
+            throw new IllegalStateException("Already instantiated");
+        }
+
         url = api + "user/auth/";
     }
 
+    public static Auth getInstance() {
+        return INSTANCE;
+    }
+
     public User login(String username, String password) throws Exception {
-//        RequestBody formBody = new FormEncodingBuilder()
-//                .add("username", username)
-//                .add("password", password)
-//                .build();
-//
-//        Request request = new Request.Builder()
-//                .url(url)
-//                .post(formBody)
-//                .build();
-
-//        client.newCall(request).enqueue(new Callback() {
-//            public void onFailure(Request request, IOException throwable) {
-//                throwable.printStackTrace();
-//            }
-//
-//            @Override
-//            public void onResponse(Response response) throws IOException {
-//                if (!response.isSuccessful()) {
-//                    System.out.println("Invalid login credentials.");
-//                } else {
-//                    String body = response.body().string();
-//                    System.out.println("Successful login.");
-//                }
-//            }
-//        });
-
-//        Response response = client.newCall(request).execute();
-//
-//        if (response.isSuccessful()) {
-//            System.out.println("Successful login.");
-//
-//            String body = response.body().string();
-//            User user = new User(getData(body).getJSONObject("user"));
-//
-//            return user;
-//        } else {
-//            System.out.println("Invalid login credentials.");
-//
-//            return null;
-//        }
+        System.out.println("login");
 
         RequestBody body = new FormEncodingBuilder()
                 .add("username", username)
@@ -67,12 +40,22 @@ public class Auth extends API {
 
         APIResponse response = post(url, body);
 
-        User user = new User(response.getData().getJSONObject("user"));
+        token = response.getObjectData().getString("authToken");
+        isLoggedIn = true;
+        user = new User(response.getObjectData().getJSONObject("user"));
 
         return user;
     }
 
     public boolean isLoggedIn() {
         return isLoggedIn;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public User getUser() {
+        return user;
     }
 }

@@ -119,7 +119,6 @@ public class LoginActivity extends Activity {
     }
 
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
         return password.length() > 4;
     }
 
@@ -175,27 +174,8 @@ public class LoginActivity extends Activity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-//            try {
-//                // Simulate network access.
-//                Thread.sleep(2000);
-//            } catch (InterruptedException e) {
-//                return false;
-//            }
-//
-//            for (String credential : DUMMY_CREDENTIALS) {
-//                String[] pieces = credential.split(":");
-//                if (pieces[0].equals(mEmail)) {
-//                    // Account exists, return true if the password matches.
-//                    return pieces[1].equals(mPassword);
-//                }
-//            }
-//
-//            return false;
-
-            Auth auth = new Auth();
-
             try {
-                user = auth.login(mUsername, mPassword);
+                user = Auth.getInstance().login(mUsername, mPassword);
             } catch (Exception e) {
                 e.printStackTrace();
             }
