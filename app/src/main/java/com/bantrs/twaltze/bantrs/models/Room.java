@@ -44,6 +44,11 @@ public class Room extends API {
         this.topic = url;
     }
 
+    public Room(String rid) {
+        this.url = api + "room/";
+        this.rid = rid;
+    }
+
     public static Room getRoom(String rid) throws Exception {
         System.out.println("get room");
 

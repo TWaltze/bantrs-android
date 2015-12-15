@@ -36,7 +36,8 @@ public class RoomActivity extends Activity {
      * Keep track of the login task to ensure we can cancel it if requested.
      */
 //    private CreateCommentTask mCreateCommentTask = null;
-    private LoadRoomTask mRoomTask = null;
+//    private LoadRoomTask mRoomTask = null;
+    private LoadCommentsTask mCommentsTask = null;
 
     // UI references.
     private EditText mCommentView;
@@ -49,7 +50,6 @@ public class RoomActivity extends Activity {
     private Comment comment;
     private List<Comment> comments;
 
-//    private LoadCommentsTask mCommentsTask = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,19 +58,20 @@ public class RoomActivity extends Activity {
 
         Bundle extras = getIntent().getExtras();
         rid = extras.getString("rid");
+        room = new Room(rid);
         System.out.println(rid);
 
-        mRoomTask = new LoadRoomTask(rid);
-        mRoomTask.execute((Void) null);
+//        mRoomTask = new LoadRoomTask(rid);
+//        mRoomTask.execute((Void) null);
 
 //        mCommentView = (EditText) findViewById(R.id.comment_text);
-//        mRecyclerView = (RecyclerView)findViewById(R.id.comments_list);
+        mRecyclerView = (RecyclerView)findViewById(R.id.comments_list);
 
-//        mLayoutManager = new LinearLayoutManager(this);
-//        mRecyclerView.setLayoutManager(mLayoutManager);
-//
-//        mAdapter = new CommentAdapter();
-//        mRecyclerView.setAdapter(mAdapter);
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        mAdapter = new CommentAdapter();
+        mRecyclerView.setAdapter(mAdapter);
 
 //        Button mCreateCommentButton = (Button) findViewById(R.id.create_comment_button);
 //        mCreateCommentButton.setOnClickListener(new OnClickListener() {
@@ -101,45 +102,75 @@ public class RoomActivity extends Activity {
 //        }
 //    }
 
-//    public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHolder> {
-//        public CommentAdapter() {
-//            super();
-//        }
-//
-//        @Override
-//        public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-//            View v = LayoutInflater.from(viewGroup.getContext())
-//                    .inflate(R.layout.recycler_view_comments, viewGroup, false);
-//            ViewHolder viewHolder = new ViewHolder(v);
-//            return viewHolder;
-//        }
-//
-//        @Override
-//        public void onBindViewHolder(ViewHolder viewHolder, int i) {
-//            Comment comment = comments.get(i);
-//
-//            viewHolder.commentText.setText(comment.comment);
-//        }
-//
-//        @Override
-//        public int getItemCount() {
-//            if (comments == null) {
-//                return 0;
-//            } else {
-//                return comments.size();
-//            }
-//        }
-//
-//        class ViewHolder extends RecyclerView.ViewHolder{
-//            public TextView commentText;
-//
-//            public ViewHolder(View itemView) {
-//                super(itemView);
-//
-//                commentText = (TextView)itemView.findViewById(R.id.recycler_view_comment);
-//            }
-//        }
-//    }
+    public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHolder> {
+        public CommentAdapter() {
+            super();
+
+            mCommentsTask = new LoadCommentsTask();
+            mCommentsTask.execute((Void) null);
+        }
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+            View v = LayoutInflater.from(viewGroup.getContext())
+                    .inflate(R.layout.recycler_view_comments, viewGroup, false);
+            ViewHolder viewHolder = new ViewHolder(v);
+            return viewHolder;
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder viewHolder, int i) {
+            Comment comment = comments.get(i);
+
+            viewHolder.commentText.setText(comment.comment);
+        }
+
+        @Override
+        public int getItemCount() {
+            if (comments == null) {
+                return 0;
+            } else {
+                return comments.size();
+            }
+        }
+
+        class ViewHolder extends RecyclerView.ViewHolder{
+            public TextView commentText;
+
+            public ViewHolder(View itemView) {
+                super(itemView);
+
+                commentText = (TextView)itemView.findViewById(R.id.recycler_view_comment);
+            }
+        }
+    }
+
+    public class LoadCommentsTask extends AsyncTask<Void, Void, Boolean> {
+        LoadCommentsTask() {
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            try {
+                comments = room.getComments();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return comments != null;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            mCommentsTask = null;
+            mAdapter.notifyItemInserted(comments.size());
+        }
+
+        @Override
+        protected void onCancelled() {
+            mCommentsTask = null;
+        }
+    }
 
 //    public class CreateCommentTask extends AsyncTask<Void, Void, Boolean> {
 //
@@ -175,70 +206,42 @@ public class RoomActivity extends Activity {
 //        }
 //    }
 
-//    public class LoadCommentsTask extends AsyncTask<Void, Void, Boolean> {
-//        LoadCommentsTask() {
+//    public class LoadRoomTask extends AsyncTask<Void, Void, Boolean> {
+//        private Room loaded;
+//
+//        LoadRoomTask(String rid) {
 //        }
 //
 //        @Override
 //        protected Boolean doInBackground(Void... params) {
 //            try {
-//                comments = room.getComments();
-//                System.out.println(comments.size());
+//                loaded = Room.getRoom(rid);
 //            } catch (Exception e) {
 //                e.printStackTrace();
 //            }
 //
-//            return comments != null;
+//            return true;
 //        }
 //
 //        @Override
 //        protected void onPostExecute(final Boolean success) {
-//            mCommentsTask = null;
-////            mAdapter.notifyItemInserted(comments.size());
+//            System.out.println("Room loaded");
+//            mRoomTask = null;
+//
+//            if (success) {
+//                System.out.println("Success");
+//                room = loaded;
+//                finish();
+//
+////                mCommentsTask = new LoadCommentsTask();
+////                mCommentsTask.execute((Void) null);
+//            }
 //        }
 //
 //        @Override
 //        protected void onCancelled() {
-//            mCommentsTask = null;
+//            mRoomTask = null;
 //        }
 //    }
-
-    public class LoadRoomTask extends AsyncTask<Void, Void, Boolean> {
-        private Room loaded;
-
-        LoadRoomTask(String rid) {
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            try {
-                loaded = Room.getRoom(rid);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            System.out.println("Room loaded");
-            mRoomTask = null;
-
-            if (success) {
-                System.out.println("Success");
-                room = loaded;
-                finish();
-
-//                mCommentsTask = new LoadCommentsTask();
-//                mCommentsTask.execute((Void) null);
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mRoomTask = null;
-        }
-    }
 }
 
