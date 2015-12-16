@@ -35,7 +35,7 @@ public class RoomActivity extends Activity {
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
-//    private CreateCommentTask mCreateCommentTask = null;
+    private CreateCommentTask mCreateCommentTask = null;
 //    private LoadRoomTask mRoomTask = null;
     private LoadCommentsTask mCommentsTask = null;
 
@@ -64,7 +64,7 @@ public class RoomActivity extends Activity {
 //        mRoomTask = new LoadRoomTask(rid);
 //        mRoomTask.execute((Void) null);
 
-//        mCommentView = (EditText) findViewById(R.id.comment_text);
+        mCommentView = (EditText) findViewById(R.id.comment_text);
         mRecyclerView = (RecyclerView)findViewById(R.id.comments_list);
 
         mLayoutManager = new LinearLayoutManager(this);
@@ -73,34 +73,43 @@ public class RoomActivity extends Activity {
         mAdapter = new CommentAdapter();
         mRecyclerView.setAdapter(mAdapter);
 
-//        Button mCreateCommentButton = (Button) findViewById(R.id.create_comment_button);
-//        mCreateCommentButton.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                createComment();
-//            }
-//        });
+        Button mCreateCommentButton = (Button) findViewById(R.id.create_comment_button);
+        mCreateCommentButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                createComment();
+            }
+        });
     }
 
-//    public void createComment() {
-//        if (mCreateCommentTask != null) {
-//            return;
-//        }
-//
-//        String comment = mCommentView.getText().toString();
-//
-//        boolean cancel = false;
-//
-//        // Check for a valid comment.
-//        if (TextUtils.isEmpty(comment)) {
-//            cancel = true;
-//        }
-//
-//        if (!cancel) {
-//            mCreateCommentTask = new CreateCommentTask(comment);
-//            mCreateCommentTask.execute((Void) null);
-//        }
-//    }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if (mCommentsTask != null) {
+            mCommentsTask.cancel(false);
+        }
+    }
+
+    public void createComment() {
+        if (mCreateCommentTask != null) {
+            return;
+        }
+
+        String comment = mCommentView.getText().toString();
+
+        boolean cancel = false;
+
+        // Check for a valid comment.
+        if (TextUtils.isEmpty(comment)) {
+            cancel = true;
+        }
+
+        if (!cancel) {
+            mCreateCommentTask = new CreateCommentTask(comment);
+            mCreateCommentTask.execute((Void) null);
+        }
+    }
 
     public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHolder> {
         public CommentAdapter() {
@@ -123,6 +132,12 @@ public class RoomActivity extends Activity {
             Comment comment = comments.get(i);
 
             viewHolder.commentText.setText(comment.comment);
+            viewHolder.commentAuthor.setText(comment.author.username);
+
+            DateTime date = new DateTime(comment.createdAt);
+            DateTimeFormatter formatter = DateTimeFormat.shortDateTime().withLocale(Locale.US);
+            String output_US = formatter.print(date);
+            viewHolder.commentDate.setText(output_US);
         }
 
         @Override
@@ -136,17 +151,22 @@ public class RoomActivity extends Activity {
 
         class ViewHolder extends RecyclerView.ViewHolder{
             public TextView commentText;
+            public TextView commentAuthor;
+            public TextView commentDate;
 
             public ViewHolder(View itemView) {
                 super(itemView);
 
                 commentText = (TextView)itemView.findViewById(R.id.recycler_view_comment);
+                commentAuthor = (TextView)itemView.findViewById(R.id.recycler_view_comment_author);
+                commentDate = (TextView)itemView.findViewById(R.id.recycler_view_comment_date);
             }
         }
     }
 
     public class LoadCommentsTask extends AsyncTask<Void, Void, Boolean> {
         LoadCommentsTask() {
+            System.out.println("LoadCommentsTask");
         }
 
         @Override
@@ -164,6 +184,9 @@ public class RoomActivity extends Activity {
         protected void onPostExecute(final Boolean success) {
             mCommentsTask = null;
             mAdapter.notifyItemInserted(comments.size());
+
+            mCommentsTask = new LoadCommentsTask();
+            mCommentsTask.execute((Void) null);
         }
 
         @Override
@@ -172,39 +195,39 @@ public class RoomActivity extends Activity {
         }
     }
 
-//    public class CreateCommentTask extends AsyncTask<Void, Void, Boolean> {
-//
-//        private final String mComment;
-//
-//        CreateCommentTask(String comment) {
-//            mComment = comment;
-//        }
-//
-//        @Override
-//        protected Boolean doInBackground(Void... params) {
-//            try {
-//                comment = new Comment(mComment, rid).create();
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//
-//            return room != null;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(final Boolean success) {
-//            mCreateCommentTask = null;
-//
-//            if (success) {
-//                finish();
-//            }
-//        }
-//
-//        @Override
-//        protected void onCancelled() {
-//            mCreateCommentTask = null;
-//        }
-//    }
+    public class CreateCommentTask extends AsyncTask<Void, Void, Boolean> {
+
+        private final String mComment;
+
+        CreateCommentTask(String comment) {
+            mComment = comment;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            try {
+                comment = new Comment(mComment, rid).create();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return room != null;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            mCreateCommentTask = null;
+
+            if (success) {
+                finish();
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            mCreateCommentTask = null;
+        }
+    }
 
 //    public class LoadRoomTask extends AsyncTask<Void, Void, Boolean> {
 //        private Room loaded;

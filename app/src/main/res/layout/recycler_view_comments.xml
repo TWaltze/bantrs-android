@@ -4,18 +4,18 @@
     android:layout_height="wrap_content"
     android:padding="@dimen/activity_horizontal_margin">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp">
 
         <TextView
             android:id="@+id/recycler_view_comment_author"
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
+            android:layout_alignParentStart="true"
             android:text="Author"
             style="@style/Base.TextAppearance.AppCompat.Small"
             android:textColor="#000000"
@@ -23,12 +23,12 @@
 
         <TextView
             android:id="@+id/recycler_view_comment_date"
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
+            android:layout_alignParentEnd="true"
             android:text="Date"
             style="@style/Base.TextAppearance.AppCompat.Small"/>
-    </LinearLayout>
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/recycler_view_comment"

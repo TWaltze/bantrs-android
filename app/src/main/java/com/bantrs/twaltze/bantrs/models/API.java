@@ -16,7 +16,7 @@ import org.json.JSONObject;
 import org.json.JSONObject;
 
 public abstract class API {
-    public static final String api = "http://192.168.1.128:3000/";
+    public static final String api = "http://10.0.2.2:3000/";
     protected final OkHttpClient client = new OkHttpClient();
 
     public static JSONObject getMeta(String json) {
